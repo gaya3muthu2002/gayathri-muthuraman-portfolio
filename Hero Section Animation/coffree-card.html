@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link href="https://fonts.googleapis.com/css2?family=Fira+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+:root {
+  --text: #3A3630; --muted: #8A857E; --subtle: #C0BAB2;
+  --border: #E8E4DF; --bg: #FFFFFF; --surface: #F7F5F2; --accent: #b07b86; --sidebar: 200px;
+}
+html { scroll-behavior: smooth; }
+body { background:var(--bg); color:var(--text); font-family:'Fira Mono',monospace; font-size:13px; line-height:1.7; overflow-x:hidden; }
+.hero { position:relative; width:100%; height:44vh; min-height:280px; overflow:hidden; }
+.hero-gradient { position:absolute; inset:0; background:linear-gradient(135deg,#D4C5E2 0%,#E8C9C0 30%,#EDD5B8 60%,#C9D4E2 100%); background-size:400% 400%; animation:gradShift 12s ease infinite; }
+@keyframes gradShift { 0%{background-position:0% 50%} 50%{background-position:100% 50%} 100%{background-position:0% 50%} }
+.hero-grain { position:absolute; inset:0; opacity:0.55; background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"); background-repeat:repeat; background-size:180px 180px; mix-blend-mode:overlay; pointer-events:none; }
+.hero-nav { position:absolute; top:0; right:0; padding:1.5rem 2rem; font-size:11px; color:var(--text); letter-spacing:0.04em; opacity:0.7; display:flex; gap:2rem; align-items:center; }
+.hero-nav a { color:var(--text); text-decoration:none; opacity:0.7; transition:opacity 0.2s; }
+.hero-nav a:hover { opacity:1; }
+.hero-title { position:absolute; bottom:1.75rem; left:50%; transform:translateX(-50%); font-size:11px; color:var(--text); opacity:0.5; letter-spacing:0.06em; white-space:nowrap; }
+.layout { display:grid; grid-template-columns:var(--sidebar) 1fr; max-width:960px; margin:0 auto; padding:0 2rem; align-items:start; }
+.sidebar { position:sticky; top:0; height:100vh; padding:3rem 1.5rem 3rem 0; border-right:1px solid var(--border); display:flex; flex-direction:column; gap:0.25rem; overflow-y:auto; }
+.sidebar-label { font-size:9px; letter-spacing:0.12em; text-transform:uppercase; color:var(--accent); margin-bottom:1rem; }
+.nav-item { display:flex; align-items:center; gap:0.6rem; padding:0.35rem 0; font-size:11px; color:var(--muted); text-decoration:none; letter-spacing:0.02em; transition:color 0.2s; font-family:'Fira Mono',monospace; line-height:1.4; }
+.nav-item:hover { color:var(--text); }
+.nav-item.active { color:var(--text); font-weight:500; }
+.nav-dot { width:4px; height:4px; border-radius:50%; background:var(--subtle); flex-shrink:0; transition:background 0.2s, transform 0.2s; }
+.nav-item.active .nav-dot { background:var(--text); transform:scale(1.4); }
+.content { padding:3rem 0 8rem 3rem; }
+.case-section { padding-bottom:5rem; border-bottom:1px solid var(--border); margin-bottom:5rem; }
+.case-section:last-child { border-bottom:none; margin-bottom:0; }
+.panel-eyebrow { font-size:9px; letter-spacing:0.12em; text-transform:uppercase; color:var(--accent); margin-bottom:0.5rem; }
+.panel-title { font-size:18px; font-weight:500; color:var(--text); margin-bottom:1.5rem; letter-spacing:-0.01em; line-height:1.3; }
+.panel-body { font-size:12px; color:var(--muted); line-height:1.9; max-width:540px; }
+.panel-body p { margin-bottom:1rem; }
+.panel-body p:last-child { margin-bottom:0; }
+.panel-body strong { color:var(--text); font-weight:500; }
+.divider { height:1px; background:var(--border); margin:1.5rem 0; max-width:540px; }
+.callout { border-left:2px solid var(--subtle); padding:0.75rem 1.25rem; margin:1.5rem 0; background:var(--surface); border-radius:0 8px 8px 0; max-width:540px; }
+.highlights { background:var(--surface); border:1px solid var(--border); border-left:2px solid var(--accent); border-radius:0 10px 10px 0; padding:1rem 1.25rem 1.1rem; margin-bottom:2rem; max-width:540px; }
+.highlights-label { font-size:9px; letter-spacing:0.12em; text-transform:uppercase; color:var(--accent); margin-bottom:0.5rem; }
+.highlights-label span { color:#A89F98; text-transform:none; letter-spacing:0.02em; margin-left:0.4rem; }
+.highlights p { font-size:13px; color:var(--text); line-height:1.65; margin:0; }
+.highlights strong { font-weight:700; }
+.callout p { font-size:12px; color:var(--text); line-height:1.75; font-style:italic; margin:0; }
+.case-img { width:100%; max-width:540px; border-radius:10px; border:1px solid var(--border); margin:1.5rem 0 0.5rem; display:block; }
+.img-caption { font-size:10px; color:var(--subtle); letter-spacing:0.04em; margin-bottom:1.5rem; max-width:540px; }
+.case-table { width:100%; max-width:540px; border-collapse:collapse; margin:1.5rem 0; font-size:11px; }
+.case-table th { text-align:left; padding:0.5rem 0.75rem; font-size:9px; letter-spacing:0.1em; text-transform:uppercase; color:var(--subtle); border-bottom:1px solid var(--border); font-weight:400; }
+.case-table td { padding:0.65rem 0.75rem; border-bottom:1px solid var(--border); color:var(--muted); vertical-align:top; line-height:1.65; }
+.case-table td:first-child { color:var(--text); font-weight:500; }
+.case-table tr:last-child td { border-bottom:none; }
+.meta-row { display:flex; gap:2.5rem; flex-wrap:wrap; margin-bottom:2rem; padding-bottom:2rem; border-bottom:1px solid var(--border); max-width:540px; }
+.meta-item { display:flex; flex-direction:column; gap:0.2rem; }
+.meta-label { font-size:9px; letter-spacing:0.1em; text-transform:uppercase; color:var(--subtle); }
+.meta-value { font-size:11px; color:var(--text); line-height:1.4; }
+.tag-row { display:flex; gap:0.5rem; flex-wrap:wrap; margin-bottom:1.5rem; }
+.tag { font-size:9px; padding:0.2rem 0.6rem; border-radius:100px; border:1px solid var(--border); color:var(--muted); letter-spacing:0.04em; }
+.impact-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:1rem; max-width:540px; margin:1.5rem 0; }
+.impact-card { background:var(--surface); border-radius:10px; padding:1rem 1.25rem; border:1px solid var(--border); }
+.impact-card-label { font-size:9px; letter-spacing:0.1em; text-transform:uppercase; color:var(--subtle); margin-bottom:0.5rem; }
+.impact-stat { font-size:20px; font-weight:700; color:var(--text); letter-spacing:-0.02em; margin-bottom:0.25rem; display:block; }
+.impact-card-items { font-size:10px; color:var(--muted); line-height:1.7; }
+.deliverables-list { max-width:540px; margin:1.5rem 0; border:1px solid var(--border); border-radius:10px; overflow:hidden; }
+.deliverable-row { display:grid; grid-template-columns:1fr 1.5fr; border-bottom:1px solid var(--border); }
+.deliverable-row:last-child { border-bottom:none; }
+.deliverable-name { font-size:11px; color:var(--text); font-weight:500; padding:0.75rem 1rem; border-right:1px solid var(--border); }
+.deliverable-desc { font-size:11px; color:var(--muted); padding:0.75rem 1rem; line-height:1.6; }
+.placeholder { font-size:11px; color:var(--subtle); font-style:italic; margin-top:0.5rem; }
+.next-link { display:inline-flex; align-items:center; gap:0.5rem; font-size:12px; color:var(--text); text-decoration:none; margin-top:1rem; transition:gap 0.2s; }
+.next-link:hover { gap:0.8rem; }
+.finding-list { max-width:540px; margin:1.5rem 0; display:flex; flex-direction:column; gap:1rem; }
+.finding { display:grid; grid-template-columns:24px 1fr; gap:0.75rem; align-items:start; }
+.finding-num { font-size:9px; color:var(--subtle); padding-top:0.15rem; }
+.finding-text { font-size:12px; color:var(--muted); line-height:1.75; }
+.finding-text strong { color:var(--text); font-weight:500; }
+.page-footer { max-width:960px; margin:0 auto; padding:2rem 2rem 3rem; display:flex; justify-content:space-between; border-top:1px solid var(--border); font-size:11px; color:var(--muted); }
+.page-footer a { color:var(--muted); text-decoration:none; transition:color 0.2s; }
+.page-footer a:hover { color:var(--text); }
+@media(max-width:640px) {
+  .layout { grid-template-columns:1fr; }
+  .sidebar { position:relative; height:auto; border-right:none; border-bottom:1px solid var(--border); padding:1.5rem 0; flex-direction:row; flex-wrap:wrap; gap:0.5rem; overflow-x:auto; }
+  .sidebar-label { display:none; }
+  .content { padding:2rem 0 4rem; }
+  .impact-grid { grid-template-columns:1fr; }
+  .deliverable-row { grid-template-columns:1fr; }
+  .deliverable-name { border-right:none; border-bottom:1px solid var(--border); }
+}
+
+/* ── INSIGHT CARDS ── */
+.insight-cards { display:grid; grid-template-columns:repeat(3,1fr); gap:1rem; max-width:540px; margin:1.5rem 0; }
+.insight-card { background:var(--surface); border:1px solid var(--border); border-radius:10px; padding:1.1rem 1.1rem 1.25rem; display:flex; flex-direction:column; gap:0.5rem; }
+.insight-num { font-size:9px; color:var(--subtle); letter-spacing:0.08em; }
+.insight-title { font-size:11px; font-weight:500; color:var(--text); line-height:1.4; }
+.insight-body { font-size:10px; color:var(--muted); line-height:1.65; }
+
+/* ── DECISION SPLIT ── */
+.decision-split { display:grid; grid-template-columns:1fr 28px 1fr; gap:0; max-width:540px; margin:1.5rem 0; align-items:center; }
+.decision-side { border:1px solid var(--border); border-radius:10px; padding:1.25rem; background:var(--surface); }
+.decision-before .decision-label { font-size:9px; color:var(--subtle); letter-spacing:0.08em; margin-bottom:0.4rem; }
+.decision-after .decision-label { font-size:9px; color:var(--subtle); letter-spacing:0.08em; margin-bottom:0.4rem; }
+.decision-after { border-color:var(--text); background:var(--bg); }
+.decision-heading { font-size:12px; font-weight:500; color:var(--text); margin-bottom:0.4rem; line-height:1.3; }
+.decision-body { font-size:10px; color:var(--muted); line-height:1.6; }
+.decision-arrow { text-align:center; font-size:14px; color:var(--subtle); }
+
+/* ── TIMELINE ── */
+.timeline { max-width:540px; margin:1.5rem 0; position:relative; padding-left:1.5rem; display:flex; flex-direction:column; gap:0; }
+.timeline-track { position:absolute; left:5px; top:8px; bottom:8px; width:1px; background:var(--border); }
+.timeline-step { display:flex; gap:1rem; align-items:flex-start; padding-bottom:1.75rem; position:relative; }
+.timeline-step:last-child { padding-bottom:0; }
+.timeline-dot { width:9px; height:9px; border-radius:50%; border:1.5px solid var(--text); background:var(--bg); flex-shrink:0; margin-top:3px; position:relative; z-index:1; left:-1.25rem; margin-right:-0.25rem; }
+.timeline-content { display:flex; flex-direction:column; gap:0.3rem; }
+.timeline-title { font-size:12px; font-weight:500; color:var(--text); }
+.timeline-body { font-size:11px; color:var(--muted); line-height:1.65; max-width:440px; }
+
+/* ── EVAL CARDS ── */
+.eval-cards { display:grid; grid-template-columns:repeat(3,1fr); gap:1rem; max-width:540px; margin:1.5rem 0; }
+.eval-card { border:1px solid var(--border); border-radius:10px; padding:1.1rem; display:flex; flex-direction:column; gap:0.5rem; }
+.eval-num { font-size:9px; color:var(--subtle); letter-spacing:0.08em; }
+.eval-title { font-size:11px; font-weight:500; color:var(--text); line-height:1.4; }
+.eval-body { font-size:10px; color:var(--muted); line-height:1.65; }
+
+@media(max-width:600px) {
+  .insight-cards, .eval-cards { grid-template-columns:1fr; }
+  .decision-split { grid-template-columns:1fr; }
+  .decision-arrow { display:none; }
+}
+</style>
+</head>
+<body>
+<section class="hero">
+  <div class="hero-gradient"></div>
+  <div class="hero-grain"></div>
+  <div class="hero-nav">
+    <a href="index.html">← back</a>
+    <span>gayathri muthuraman</span>
+  </div>
+  <div class="hero-title">digital coffree card</div>
+</section>
+<div class="layout">
+  <nav class="sidebar">
+    <div class="sidebar-label">case study</div>
+    <a class="nav-item active" href="#overview"><span class="nav-dot"></span>overview</a>
+    <a class="nav-item" href="#role"><span class="nav-dot"></span>my role</a>
+    <a class="nav-item" href="#research"><span class="nav-dot"></span>research</a>
+    <a class="nav-item" href="#decision"><span class="nav-dot"></span>a key decision</a>
+    <a class="nav-item" href="#design"><span class="nav-dot"></span>design process</a>
+    <a class="nav-item" href="#evaluation"><span class="nav-dot"></span>evaluation</a>
+    <a class="nav-item" href="#challenges"><span class="nav-dot"></span>challenges</a>
+    <a class="nav-item" href="#impact"><span class="nav-dot"></span>impact</a>
+    <a class="nav-item" href="#reflection"><span class="nav-dot"></span>reflection</a>
+  </nav>
+  <div class="content">
+
+    <section class="case-section" id="overview">
+      <div class="panel-eyebrow">// overview</div>
+      <h1 class="panel-title">reimagining a low-tech tradition for a digital-first café</h1>
+      <div class="highlights">
+        <div class="highlights-label">highlights <span>· the 30-second version</span></div>
+        <p>led the end-to-end redesign of capital one café's paper "coffree card" for a digital-first experience — preserving the spontaneous, warm handoff while initiating a <strong>reusable design system</strong> that outlasted the internship.</p>
+      </div>
+      <div class="meta-row">
+        <div class="meta-item">
+          <span class="meta-label">role</span>
+          <span class="meta-value">project lead<br>(ux design intern)</span>
+        </div>
+        <div class="meta-item">
+          <span class="meta-label">company</span>
+          <span class="meta-value">capital one</span>
+        </div>
+        <div class="meta-item">
+          <span class="meta-label">timeline</span>
+          <span class="meta-value">summer 2023</span>
+        </div>
+      </div>
+      <div class="tag-row">
+        <span class="tag">contextual research</span>
+        <span class="tag">usability testing</span>
+        <span class="tag">content design</span>
+        <span class="tag">rapid prototyping</span>
+        <span class="tag">design systems</span>
+      </div>
+      <div class="panel-body">
+        <p>capital one café ambassadors use "coffree cards" — one-time promotional drink coupons — to surprise visitors, build relationships, and recover from service hiccups. the paper version worked. but it left the business blind: no tracking, no targeting, no visibility into distribution or redemption.</p>
+        <p>the challenge wasn't digitizing a card. it was <strong>keeping what made the paper card work</strong> — the spontaneity, the warmth, the frictionless handoff — while giving the business what it needed.</p>
+      </div>
+    </section>
+
+    <section class="case-section" id="role">
+      <div class="panel-eyebrow">// my role</div>
+      <h2 class="panel-title">intern by title. lead by responsibility.</h2>
+      <div class="panel-body">
+        <p>i was the project lead from research through prototype handoff. a project mentor provided guidance — but the decisions, the facilitation, and the delivery were mine to own. ownership isn't about title: it's about being the person who holds the direction when things get ambiguous.</p>
+      </div>
+    </section>
+
+    <section class="case-section" id="research">
+      <div class="panel-eyebrow">// research</div>
+      <h2 class="panel-title">watching the handoff in the wild</h2>
+      <div class="panel-body">
+        <p>i ran contextual research and interviews at two capital one cafés — chinatown and georgetown — observing ambassadors using cards in real interactions, then following up with structured conversations.</p>
+      </div>
+      <div class="insight-cards">
+        <div class="insight-card">
+          <div class="insight-num">01</div>
+          <div class="insight-title">the handoff moment is fragile</div>
+          <div class="insight-body">too many taps, a login, or an explanation would kill the natural ambassador-visitor conversation. the card had to feel as effortless as paper.</div>
+        </div>
+        <div class="insight-card">
+          <div class="insight-num">02</div>
+          <div class="insight-title">not ready to go fully digital</div>
+          <div class="insight-body">use cases varied — service recovery, spontaneous delight, targeted promotions. feedback was clear: digital should complement paper, not replace it.</div>
+        </div>
+        <div class="insight-card">
+          <div class="insight-num">03</div>
+          <div class="insight-title">the back-end was a real constraint</div>
+          <div class="insight-body">card distribution systems were outdated and hard to maintain. any solution dependent on them staying current would inherit the same fragility.</div>
+        </div>
+      </div>
+      <p class="placeholder">[ insert 1–2 ambassador quotes here ]</p>
+    </section>
+
+    <section class="case-section" id="decision">
+      <div class="panel-eyebrow">// a key decision</div>
+      <h2 class="panel-title">pushing back on the brief</h2>
+      <div class="decision-split">
+        <div class="decision-side decision-before">
+          <div class="decision-label">original brief</div>
+          <div class="decision-heading">digital replaces paper</div>
+          <div class="decision-body">one system, fully digital, replaces the physical card entirely across all cafés</div>
+        </div>
+        <div class="decision-arrow">→</div>
+        <div class="decision-side decision-after">
+          <div class="decision-label">what research found</div>
+          <div class="decision-heading">digital complements paper</div>
+          <div class="decision-body">a hybrid model that adds tracking and targeting without breaking the use cases that made the paper card work</div>
+        </div>
+      </div>
+      <div class="callout" style="margin-top:1.5rem">
+        <p>the best design decision on this project wasn't a ui choice — it was recognizing that the brief was wrong and having the evidence to say so.</p>
+      </div>
+    </section>
+
+    <section class="case-section" id="design">
+      <div class="panel-eyebrow">// design process</div>
+      <h2 class="panel-title">iterating toward the effortless handoff</h2>
+      <div class="timeline">
+        <div class="timeline-track"></div>
+        <div class="timeline-step">
+          <div class="timeline-dot"></div>
+          <div class="timeline-content">
+            <div class="timeline-title">design jams</div>
+            <div class="timeline-body">generate and pressure-test concepts with senior designers before investing in polish</div>
+          </div>
+        </div>
+        <div class="timeline-step">
+          <div class="timeline-dot"></div>
+          <div class="timeline-content">
+            <div class="timeline-title">working sessions</div>
+            <div class="timeline-body">iterate quickly with mentor feedback, sketch new variations, course-correct early</div>
+          </div>
+        </div>
+        <div class="timeline-step">
+          <div class="timeline-dot"></div>
+          <div class="timeline-content">
+            <div class="timeline-title">content reviews</div>
+            <div class="timeline-body">collaborate with content designer to ensure microcopy was clear and on-brand</div>
+          </div>
+        </div>
+        <div class="timeline-step">
+          <div class="timeline-dot"></div>
+          <div class="timeline-content">
+            <div class="timeline-title">experience reviews</div>
+            <div class="timeline-body">align with existing design standards before prototype handoff</div>
+          </div>
+        </div>
+      </div>
+      <p class="placeholder" style="margin-top:1.5rem">[ insert 2–3 annotated iteration frames ]</p>
+    </section>
+
+    <section class="case-section" id="evaluation">
+      <div class="panel-eyebrow">// evaluation</div>
+      <h2 class="panel-title">testing against the paper experience</h2>
+      <div class="panel-body">
+        <p>i co-led an ambassador feedback panel to evaluate the prototype against the paper experience — testing usability, workflow fit, and trust in the digital transition.</p>
+      </div>
+      <div class="eval-cards">
+        <div class="eval-card">
+          <div class="eval-num">01</div>
+          <div class="eval-title">framing matters</div>
+          <div class="eval-body">ambassadors accepted the hybrid model once it was presented as additive — not a replacement for the paper card they trusted</div>
+        </div>
+        <div class="eval-card">
+          <div class="eval-num">02</div>
+          <div class="eval-title">speed is non-negotiable</div>
+          <div class="eval-body">the send flow needed fewer steps — any pause mid-conversation broke the natural handoff ambassadors depended on</div>
+        </div>
+        <div class="eval-card">
+          <div class="eval-num">03</div>
+          <div class="eval-title">microcopy drove trust</div>
+          <div class="eval-body">how we worded redemption and expiration directly shaped whether ambassadors felt confident giving out the digital card</div>
+        </div>
+      </div>
+      <p class="placeholder" style="margin-top:1.5rem">[ insert 2–3 prototype screens — send flow and redemption experience ]</p>
+    </section>
+
+    <section class="case-section" id="challenges">
+      <div class="panel-eyebrow">// challenges</div>
+      <h2 class="panel-title">the hard parts</h2>
+      <div class="panel-body">
+        <p><strong>compressed timeline.</strong> the project was shortened mid-engagement. i reprioritized fast and kept stakeholders informed to deliver without cutting what mattered.</p>
+      </div>
+      <div class="divider"></div>
+      <div class="panel-body">
+        <p><strong>compliance early, not late.</strong> linking promotions to customer data meant surfacing privacy and legal constraints before they became blockers — not after.</p>
+      </div>
+      <div class="divider"></div>
+      <div class="panel-body">
+        <p><strong>no design system to build on.</strong> the legacy platform had inconsistent standards. rather than work around it, i advocated for and helped initiate a new design system. that work outlasted the internship.</p>
+      </div>
+    </section>
+
+    <section class="case-section" id="impact">
+      <div class="panel-eyebrow">// impact</div>
+      <h2 class="panel-title">what changed</h2>
+      <div class="impact-grid">
+        <div class="impact-card">
+          <div class="impact-card-label">ambassadors</div>
+          <span class="impact-stat">↑</span>
+          <div class="impact-card-items">a digital tool that enhances — not replaces — the surprise-and-delight moment</div>
+        </div>
+        <div class="impact-card">
+          <div class="impact-card-label">business</div>
+          <span class="impact-stat">✦</span>
+          <div class="impact-card-items">offer targeting and redemption tracking for the first time</div>
+        </div>
+        <div class="impact-card">
+          <div class="impact-card-label">visitors</div>
+          <span class="impact-stat">↑</span>
+          <div class="impact-card-items">a seamless redemption experience that feels personal, not transactional</div>
+        </div>
+      </div>
+      <div class="panel-body" style="margin-top:1.5rem">
+        <p>the new design system initiated during this project standardized the legacy platform and created reusable components for future work — an impact that outlasted the internship itself.</p>
+      </div>
+      <p class="placeholder">[ insert ambassador feedback from evaluation panel ]</p>
+    </section>
+
+    <section class="case-section" id="reflection">
+      <div class="panel-eyebrow">// reflection</div>
+      <h2 class="panel-title">what i'd do differently</h2>
+      <div class="panel-body">
+        <p>define the post-launch evaluation phase upfront — not as an add-on. we had strong prototype feedback but no plan to measure how the design performed in a live café.</p>
+        <p>i'd also map back-end constraints to front-end decisions earlier in the process. the legacy system limitations surfaced late and created avoidable rework.</p>
+      </div>
+      <div class="divider"></div>
+      <div class="panel-body"><p style="color:var(--subtle); font-size:11px;">back to start</p></div>
+      <a href="teller-case-study.html" class="next-link">teller servicing →</a>
+    </section>
+
+  </div>
+</div>
+<footer class="page-footer">
+  <a href="index.html">← all work</a>
+  <a href="resume.html">résumé</a>
+  <span>designed with care &lt;3</span>
+</footer>
+<script>
+const sections = document.querySelectorAll('.case-section');
+const navItems = document.querySelectorAll('.nav-item');
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      const id = entry.target.id;
+      navItems.forEach(item => {
+        item.classList.remove('active');
+        if (item.getAttribute('href') === '#' + id) item.classList.add('active');
+      });
+    }
+  });
+}, { rootMargin: '-20% 0px -70% 0px', threshold: 0 });
+sections.forEach(s => observer.observe(s));
+</script>
+</body>
+</html>
